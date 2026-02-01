@@ -4,13 +4,38 @@
     <meta charset="UTF-8" />
     <title>TabLedger</title>
     <style>
-      body { font-family: Arial, sans-serif; padding: 12px; width: 240px; }
-      h2 { margin: 0 0 8px; }
-      p { margin: 0; color: #555; }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 12px;
+        width: 280px;
+      }
+      h2 {
+        margin: 0 0 8px;
+      }
+      .muted {
+        color: #666;
+        font-size: 13px;
+      }
+      .stats {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 10px;
+      }
+      .value {
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <h2>TabLedger</h2>
-    <p>Extension loaded successfully.</p>
+    <div class="muted">Quick tab overview</div>
+
+    <div class="stats">
+      <div>Windows: <span id="winCount" class="value">...</span></div>
+      <div>Tabs: <span id="tabCount" class="value">...</span></div>
+    </div>
+
+    <script src="popup.js"></script>
   </body>
 </html>
