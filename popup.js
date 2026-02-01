@@ -1,16 +1,21 @@
 const listEl = document.getElementById("list");
 const errorEl = document.getElementById("error");
+const statusEl = document.getElementById("status");
+
+const btnViewSaved = document.getElementById("btnViewSaved");
+const btnSelectAll = document.getElementById("btnSelectAll");
+const btnSaveSelected = document.getElementById("btnSaveSelected");
+
+let latestWindows = [];
+let selectedTabIds = new Set();
 
 function getNiceTitle(tab) {
-    // Prefer title if present
     if (tab.title && tab.title.trim()) return tab.title.trim();
 
-    // Fallback to hostname if possible
     try {
         const u = new URL(tab.url);
         return u.hostname || "(No title)";
-    } catch (e) {
-        // For chrome://, about:blank, etc.
+    } catch {
         return tab.url || "(No title)";
     }
 }
@@ -20,8 +25,24 @@ function getNiceUrl(tab) {
 }
 
 function getFallbackFavicon() {
-    // tiny gray rounded square svg
     return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' rx='3' ry='3' fill='%23ddd'/%3E%3C/svg%3E";
+}
+
+function flattenTabs(windows) {
+    const tabs = [];
+    windows.forEach((w) => {
+        (w.tabs || []).forEach((t) => tabs.push(t));
+    });
+    return tabs;
+}
+
+function setStatus(msg) {
+    statusEl.textContent = msg;
+    if (msg) {
+        setTimeout(() => {
+            statusEl.textContent = "";
+        }, 1600);
+    }
 }
 
 function renderList(windows) {
@@ -37,11 +58,21 @@ function renderList(windows) {
             const row = document.createElement("div");
             row.className = "tabRow";
 
+            // checkbox
+            const cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.className = "checkbox";
+            cb.checked = selectedTabIds.has(tab.id);
+
+            cb.addEventListener("change", () => {
+                if (cb.checked) selectedTabIds.add(tab.id);
+                else selectedTabIds.delete(tab.id);
+            });
+
             // favicon
             const icon = document.createElement("img");
             icon.className = "favicon";
             icon.alt = "";
-
             icon.src = tab.favIconUrl || getFallbackFavicon();
             icon.onerror = () => {
                 icon.src = getFallbackFavicon();
@@ -62,6 +93,7 @@ function renderList(windows) {
             textWrap.appendChild(title);
             textWrap.appendChild(url);
 
+            row.appendChild(cb);
             row.appendChild(icon);
             row.appendChild(textWrap);
 
@@ -75,6 +107,7 @@ async function refresh() {
         errorEl.textContent = "";
 
         const windows = await chrome.windows.getAll({ populate: true });
+        latestWindows = windows;
 
         const winCount = windows.length;
         const tabCount = windows.reduce((acc, w) => acc + (w.tabs?.length || 0), 0);
@@ -88,5 +121,47 @@ async function refresh() {
         errorEl.textContent = "Could not load tabs. Please reload extension.";
     }
 }
+
+btnSelectAll.addEventListener("click", () => {
+    const allTabs = flattenTabs(latestWindows);
+    allTabs.forEach((t) => selectedTabIds.add(t.id));
+    renderList(latestWindows);
+    setStatus(`Selected ${allTabs.length} tabs ✅`);
+});
+
+btnViewSaved.addEventListener("click", () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") });
+});
+
+btnSaveSelected.addEventListener("click", async () => {
+    const allTabs = flattenTabs(latestWindows);
+    const selectedTabs = allTabs.filter((t) => selectedTabIds.has(t.id));
+
+    if (selectedTabs.length === 0) {
+        setStatus("No tabs selected ⚠️");
+        return;
+    }
+
+    const snapshot = {
+        id: crypto.randomUUID(),
+        createdAt: Date.now(),
+        tabs: selectedTabs.map((t) => ({
+            title: t.title,
+            url: t.url,
+            favIconUrl: t.favIconUrl,
+            pinned: t.pinned
+        }))
+    };
+
+    const data = await chrome.storage.local.get(["snapshots"]);
+    const snapshots = data.snapshots || [];
+    snapshots.unshift(snapshot);
+
+    await chrome.storage.local.set({ snapshots });
+
+    setStatus(`Saved ✅ (${selectedTabs.length} tabs)`);
+    selectedTabIds.clear();
+    renderList(latestWindows);
+});
 
 refresh();

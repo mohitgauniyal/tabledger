@@ -25,12 +25,38 @@
       padding: 10px;
       border: 1px solid #eee;
       border-radius: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       font-size: 13px;
     }
 
     .value {
       font-weight: bold;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    button:hover {
+      background: #f5f5f5;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #0a7a28;
+      margin-bottom: 8px;
+      min-height: 16px;
     }
 
     .list {
@@ -51,30 +77,11 @@
       gap: 8px;
       padding: 6px 0;
       border-bottom: 1px dashed #f0f0f0;
+      align-items: flex-start;
     }
 
-    .favicon {
-      width: 16px;
-      height: 16px;
-      margin-top: 2px;
-      border-radius: 3px;
-    }
-
-    .tabTitle {
-      font-size: 13px;
-      line-height: 1.2;
-      font-weight: 500;
-    }
-
-    .tabText {
-      flex: 1;
-    }
-
-    .tabUrl {
-      font-size: 11px;
-      color: #777;
-      word-break: break-all;
-      margin-top: 2px;
+    .checkbox {
+      margin-top: 4px;
     }
 
     .favicon {
@@ -83,6 +90,23 @@
       margin-top: 2px;
       border-radius: 3px;
       background: #f2f2f2;
+    }
+
+    .tabText {
+      flex: 1;
+    }
+
+    .tabTitle {
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 500;
+    }
+
+    .tabUrl {
+      font-size: 11px;
+      color: #777;
+      word-break: break-all;
+      margin-top: 2px;
     }
 
     .error {
@@ -101,6 +125,14 @@
     <div>Windows: <span id="winCount" class="value">...</span></div>
     <div>Tabs: <span id="tabCount" class="value">...</span></div>
   </div>
+
+  <div class="actions">
+    <button id="btnSelectAll">Select All</button>
+    <button id="btnSaveSelected">Save Selected</button>
+    <button id="btnViewSaved">View Saved</button>
+  </div>
+
+  <div id="status" class="status"></div>
 
   <div id="list" class="list"></div>
   <div id="error" class="error"></div>

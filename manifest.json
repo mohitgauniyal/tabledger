@@ -3,7 +3,10 @@
   "name": "TabLedger",
   "version": "0.1.1",
   "description": "Save tab snapshots and restore them later.",
-  "permissions": ["tabs"],
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "TabLedger"
