@@ -1,41 +1,111 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>TabLedger</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        padding: 12px;
-        width: 280px;
-      }
-      h2 {
-        margin: 0 0 8px;
-      }
-      .muted {
-        color: #666;
-        font-size: 13px;
-      }
-      .stats {
-        margin-top: 10px;
-        padding: 10px;
-        border: 1px solid #eee;
-        border-radius: 10px;
-      }
-      .value {
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>TabLedger</h2>
-    <div class="muted">Quick tab overview</div>
 
-    <div class="stats">
-      <div>Windows: <span id="winCount" class="value">...</span></div>
-      <div>Tabs: <span id="tabCount" class="value">...</span></div>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>TabLedger</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 12px;
+      width: 320px;
+    }
 
-    <script src="popup.js"></script>
-  </body>
+    h2 {
+      margin: 0 0 6px;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .stats {
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .value {
+      font-weight: bold;
+    }
+
+    .list {
+      max-height: 420px;
+      overflow-y: auto;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+
+    .windowTitle {
+      font-weight: bold;
+      font-size: 13px;
+      margin: 10px 0 6px;
+    }
+
+    .tabRow {
+      display: flex;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px dashed #f0f0f0;
+    }
+
+    .favicon {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      border-radius: 3px;
+    }
+
+    .tabTitle {
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 500;
+    }
+
+    .tabText {
+      flex: 1;
+    }
+
+    .tabUrl {
+      font-size: 11px;
+      color: #777;
+      word-break: break-all;
+      margin-top: 2px;
+    }
+
+    .favicon {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      border-radius: 3px;
+      background: #f2f2f2;
+    }
+
+    .error {
+      color: #b00020;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>TabLedger</h2>
+  <div class="muted">See what's open before you clean up.</div>
+
+  <div class="stats">
+    <div>Windows: <span id="winCount" class="value">...</span></div>
+    <div>Tabs: <span id="tabCount" class="value">...</span></div>
+  </div>
+
+  <div id="list" class="list"></div>
+  <div id="error" class="error"></div>
+
+  <script src="popup.js"></script>
+</body>
+
 </html>
