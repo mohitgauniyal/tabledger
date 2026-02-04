@@ -31,6 +31,44 @@ async function deleteSnapshot(snapshotId) {
     render();
 }
 
+async function renameSnapshot(snapshotId, newName) {
+    const name = (newName || "").trim();
+    if (!name) return;
+
+    const snapshots = await loadSnapshots();
+    const updated = snapshots.map((s) => {
+        if (s.id !== snapshotId) return s;
+        return { ...s, name };
+    });
+
+    await saveSnapshots(updated);
+}
+
+async function copyToClipboard(text) {
+    if (!text) return;
+
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (err) {
+        console.error("Copy failed:", err);
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+    }
+}
+
+function showToast(el, msg) {
+    const old = el.textContent;
+    el.textContent = msg;
+    setTimeout(() => {
+        el.textContent = old;
+    }, 900);
+}
+
 async function render() {
     const snapshots = await loadSnapshots();
     snapshotsEl.innerHTML = "";
@@ -47,12 +85,55 @@ async function render() {
         const header = document.createElement("div");
         header.className = "row";
 
+        // LEFT side
         const left = document.createElement("div");
-        left.innerHTML = `
-      <div><b>Snapshot ${idx + 1}</b></div>
-      <div class="meta">${formatDate(s.createdAt)} • ${s.tabs.length} tabs</div>
-    `;
 
+        const titleRow = document.createElement("div");
+        titleRow.className = "snapshotTitleRow";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "snapshotName";
+        nameEl.textContent = s.name || `Snapshot ${idx + 1}`;
+        nameEl.title = "Click to rename";
+
+        const hint = document.createElement("div");
+        hint.className = "copyHint";
+        hint.textContent = "Click link to copy";
+
+        titleRow.appendChild(nameEl);
+        titleRow.appendChild(hint);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = `${formatDate(s.createdAt)} • ${s.tabs.length} tabs`;
+
+        left.appendChild(titleRow);
+        left.appendChild(meta);
+
+        // Inline rename behavior
+        nameEl.addEventListener("click", () => {
+            const input = document.createElement("input");
+            input.className = "snapshotNameInput";
+            input.value = s.name || `Snapshot ${idx + 1}`;
+            nameEl.replaceWith(input);
+            input.focus();
+            input.select();
+
+            const saveAndExit = async () => {
+                const newName = input.value.trim();
+                await renameSnapshot(s.id, newName);
+                render();
+            };
+
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") saveAndExit();
+                if (e.key === "Escape") render();
+            });
+
+            input.addEventListener("blur", saveAndExit);
+        });
+
+        // RIGHT side buttons
         const right = document.createElement("div");
         right.style.display = "flex";
         right.style.gap = "8px";
@@ -71,13 +152,14 @@ async function render() {
         header.appendChild(left);
         header.appendChild(right);
 
+        // TABS preview
         const tabsDiv = document.createElement("div");
         tabsDiv.className = "tabs";
 
-        // Show first 10 tabs as preview
         s.tabs.slice(0, 10).forEach((t) => {
             const row = document.createElement("div");
             row.className = "tabRow";
+            row.title = "Click to copy link";
 
             const icon = document.createElement("img");
             icon.className = "favicon";
@@ -100,6 +182,13 @@ async function render() {
 
             row.appendChild(icon);
             row.appendChild(text);
+
+            // ✅ click-to-copy
+            row.addEventListener("click", async () => {
+                if (!t.url) return;
+                await copyToClipboard(t.url);
+                showToast(hint, "Copied ✅");
+            });
 
             tabsDiv.appendChild(row);
         });

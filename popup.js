@@ -9,6 +9,56 @@ const btnSaveSelected = document.getElementById("btnSaveSelected");
 let latestWindows = [];
 let selectedTabIds = new Set();
 
+function formatShortDate(ts) {
+    const d = new Date(ts);
+    return d.toLocaleString(undefined, { month: "short", day: "numeric" });
+}
+
+function getDomainLabel(url) {
+    try {
+        const u = new URL(url);
+        const host = u.hostname || "";
+
+        // quick friendly mappings
+        if (host.includes("mail.google.com")) return "Gmail";
+        if (host.includes("medium.com")) return "Medium";
+        if (host.includes("youtube.com") || host.includes("youtu.be")) return "YouTube";
+        if (host.includes("github.com")) return "GitHub";
+
+        // strip common prefixes
+        const clean = host.replace(/^www\./, "");
+
+        // take main domain chunk (medium, github, etc.)
+        const first = clean.split(".")[0] || "Web";
+
+        // Title-case it
+        return first.charAt(0).toUpperCase() + first.slice(1);
+    } catch {
+        return "Web";
+    }
+}
+
+function generateSnapshotName(tabs, createdAt) {
+    const counts = new Map();
+
+    tabs.forEach((t) => {
+        const label = getDomainLabel(t.url);
+        counts.set(label, (counts.get(label) || 0) + 1);
+    });
+
+    const top = [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(([label]) => label);
+
+    const datePart = formatShortDate(createdAt);
+
+    if (top.length === 0) return `Snapshot • ${datePart}`;
+    if (top.length === 1) return `${top[0]} • ${datePart}`;
+
+    return `${top[0]} + ${top[1]} • ${datePart}`;
+}
+
 function getNiceTitle(tab) {
     if (tab.title && tab.title.trim()) return tab.title.trim();
 
@@ -142,9 +192,12 @@ btnSaveSelected.addEventListener("click", async () => {
         return;
     }
 
+    const createdAt = Date.now();
+
     const snapshot = {
         id: crypto.randomUUID(),
-        createdAt: Date.now(),
+        createdAt,
+        name: generateSnapshotName(selectedTabs, createdAt),
         tabs: selectedTabs.map((t) => ({
             title: t.title,
             url: t.url,
