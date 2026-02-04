@@ -11,6 +11,13 @@ const btnSaveCloseSelected = document.getElementById("btnSaveCloseSelected");
 const btnCloseSelected = document.getElementById("btnCloseSelected");
 const selectedCountEl = document.getElementById("selectedCount");
 
+const confirmModal = document.getElementById("confirmModal");
+const confirmTitleEl = document.getElementById("confirmTitle");
+const confirmTextEl = document.getElementById("confirmText");
+const dontAskAgainEl = document.getElementById("dontAskAgain");
+const btnConfirmCancel = document.getElementById("btnConfirmCancel");
+const btnConfirmOk = document.getElementById("btnConfirmOk");
+
 let latestWindows = [];
 let selectedTabIds = new Set();
 
@@ -104,6 +111,12 @@ function flattenTabs(windows) {
     return tabs;
 }
 
+function getSelectedTabs() {
+    const allTabs = flattenTabs(latestWindows);
+    const selectedTabs = allTabs.filter((t) => selectedTabIds.has(t.id));
+    return { allTabs, selectedTabs };
+}
+
 function setStatus(msg) {
     statusEl.textContent = msg;
     if (msg) {
@@ -112,6 +125,52 @@ function setStatus(msg) {
         }, 1600);
     }
 }
+
+let confirmResolve = null;
+
+function openConfirm({ title, text, okText = "OK", dontAskKey }) {
+    return new Promise((resolve) => {
+        confirmResolve = resolve;
+
+        confirmTitleEl.textContent = title;
+        confirmTextEl.textContent = text;
+        btnConfirmOk.textContent = okText;
+
+        dontAskAgainEl.checked = false;
+        dontAskAgainEl.dataset.key = dontAskKey || "";
+
+        confirmModal.classList.remove("hidden");
+    });
+}
+
+function closeConfirm(result) {
+    confirmModal.classList.add("hidden");
+
+    if (confirmResolve) {
+        confirmResolve(result);
+        confirmResolve = null;
+    }
+}
+
+btnConfirmCancel.addEventListener("click", () => closeConfirm(false));
+
+btnConfirmOk.addEventListener("click", async () => {
+    const key = dontAskAgainEl.dataset.key;
+    const checked = dontAskAgainEl.checked;
+
+    if (key && checked) {
+        await chrome.storage.local.set({ [key]: true });
+    }
+
+    closeConfirm(true);
+});
+
+// escape key closes modal
+document.addEventListener("keydown", (e) => {
+    if (!confirmModal.classList.contains("hidden") && e.key === "Escape") {
+        closeConfirm(false);
+    }
+});
 
 function renderList(windows) {
     listEl.innerHTML = "";
@@ -244,14 +303,94 @@ btnClearSelection.addEventListener("click", () => {
     setStatus("Selection cleared ✅");
 });
 
-btnSaveCloseSelected.addEventListener("click", () => {
-    // Placeholder for now
-    setStatus("Save & Close UPNEXT");
+btnSaveCloseSelected.addEventListener("click", async () => {
+    const { selectedTabs } = getSelectedTabs();
+
+    if (selectedTabs.length === 0) {
+        setStatus("No tabs selected ⚠️");
+        return;
+    }
+
+    const count = selectedTabs.length;
+
+    const settings = await chrome.storage.local.get(["skipSaveCloseConfirm"]);
+    const skipConfirm = settings.skipSaveCloseConfirm === true;
+
+    let allowed = true;
+
+    if (!skipConfirm) {
+        allowed = await openConfirm({
+            title: "Save snapshot and close?",
+            text: `Save snapshot and close ${count} tabs?\nYou can restore them anytime from Saved Snapshots.`,
+            okText: "Save & Close",
+            dontAskKey: "skipSaveCloseConfirm"
+        });
+    }
+
+    if (!allowed) return;
+
+    // 1) Save snapshot
+    const createdAt = Date.now();
+
+    const snapshot = {
+        id: crypto.randomUUID(),
+        createdAt,
+        name: generateSnapshotName(selectedTabs, createdAt),
+        tabs: selectedTabs.map((t) => ({
+            title: t.title,
+            url: t.url,
+            favIconUrl: t.favIconUrl,
+            pinned: t.pinned
+        }))
+    };
+
+    const data = await chrome.storage.local.get(["snapshots"]);
+    const snapshots = data.snapshots || [];
+    snapshots.unshift(snapshot);
+    await chrome.storage.local.set({ snapshots });
+
+    // 2) Close tabs
+    await chrome.tabs.remove(selectedTabs.map((t) => t.id));
+
+    // 3) Refresh UI
+    selectedTabIds.clear();
+    await refresh();
+
+    setStatus(`Saved & Closed ✅ (${count} tabs)`);
 });
 
-btnCloseSelected.addEventListener("click", () => {
-    // Placeholder for now
-    setStatus("Close Selected UPNEXT");
+
+btnCloseSelected.addEventListener("click", async () => {
+    const { selectedTabs } = getSelectedTabs();
+
+    if (selectedTabs.length === 0) {
+        setStatus("No tabs selected ⚠️");
+        return;
+    }
+
+    const count = selectedTabs.length;
+    const settings = await chrome.storage.local.get(["skipCloseConfirm"]);
+    const skipConfirm = settings.skipCloseConfirm === true;
+
+    let allowed = true;
+
+    if (!skipConfirm) {
+        allowed = await openConfirm({
+            title: "Close selected tabs?",
+            text: `Close ${count} selected tabs?\nThey will be removed from your browser.`,
+            okText: "Close Tabs",
+            dontAskKey: "skipCloseConfirm"
+        });
+    }
+
+    if (!allowed) return;
+
+    await chrome.tabs.remove(selectedTabs.map((t) => t.id));
+
+    selectedTabIds.clear();
+    await refresh();
+    setStatus(`Closed ✅ (${count} tabs)`);
 });
+
 
 refresh();

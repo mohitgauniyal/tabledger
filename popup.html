@@ -177,6 +177,57 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .modalCard {
+      width: 100%;
+      max-width: 360px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid #eee;
+    }
+
+    .modalTitle {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .modalText {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .modalCheck {
+      font-size: 12px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .modalActions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
   </style>
 </head>
 
@@ -220,6 +271,22 @@
   <div id="list" class="list"></div>
   <div id="error" class="error"></div>
 
+  <div id="confirmModal" class="modal hidden">
+    <div class="modalCard">
+      <div id="confirmTitle" class="modalTitle">Confirm</div>
+      <div id="confirmText" class="modalText"></div>
+
+      <label class="modalCheck">
+        <input type="checkbox" id="dontAskAgain" />
+        Don’t ask again
+      </label>
+
+      <div class="modalActions">
+        <button id="btnConfirmCancel">Cancel</button>
+        <button id="btnConfirmOk">OK</button>
+      </div>
+    </div>
+  </div>
   <script src="popup.js"></script>
 </body>
 
