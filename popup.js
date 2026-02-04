@@ -254,10 +254,22 @@ async function refresh() {
 
 btnSelectAll.addEventListener("click", () => {
     const allTabs = flattenTabs(latestWindows);
-    allTabs.forEach((t) => selectedTabIds.add(t.id));
+
+    const pinnedCount = allTabs.filter((t) => t.pinned).length;
+
+    // ✅ select only non-pinned tabs
+    const selectableTabs = allTabs.filter((t) => !t.pinned);
+    selectableTabs.forEach((t) => selectedTabIds.add(t.id));
+
     renderList(latestWindows);
-    setStatus(`Selected ${allTabs.length} tabs ✅`);
+
+    if (pinnedCount > 0) {
+        setStatus(`Selected ${selectableTabs.length} tabs ✅ (skipped ${pinnedCount} pinned)`);
+    } else {
+        setStatus(`Selected ${selectableTabs.length} tabs ✅`);
+    }
 });
+
 
 btnViewSaved.addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") });
@@ -313,19 +325,25 @@ btnSaveCloseSelected.addEventListener("click", async () => {
 
     const count = selectedTabs.length;
 
+    const pinnedCount = selectedTabs.filter((t) => t.pinned).length;
+    const pinnedText = pinnedCount > 0 ? ` (${pinnedCount} pinned)` : "";
+
     const settings = await chrome.storage.local.get(["skipSaveCloseConfirm"]);
     const skipConfirm = settings.skipSaveCloseConfirm === true;
 
+    const mustConfirm = pinnedCount > 0;
+
     let allowed = true;
 
-    if (!skipConfirm) {
+    if (!skipConfirm || mustConfirm) {
         allowed = await openConfirm({
             title: "Save snapshot and close?",
-            text: `Save snapshot and close ${count} tabs?\nYou can restore them anytime from Saved Snapshots.`,
+            text: `Save snapshot and close ${count} tabs${pinnedText}?\nYou can restore them anytime from Saved Snapshots.`,
             okText: "Save & Close",
             dontAskKey: "skipSaveCloseConfirm"
         });
     }
+
 
     if (!allowed) return;
 
@@ -369,19 +387,26 @@ btnCloseSelected.addEventListener("click", async () => {
     }
 
     const count = selectedTabs.length;
+
+    const pinnedCount = selectedTabs.filter((t) => t.pinned).length;
+    const pinnedText = pinnedCount > 0 ? ` (${pinnedCount} pinned)` : "";
+
     const settings = await chrome.storage.local.get(["skipCloseConfirm"]);
     const skipConfirm = settings.skipCloseConfirm === true;
 
+    const mustConfirm = pinnedCount > 0;
+
     let allowed = true;
 
-    if (!skipConfirm) {
+    if (!skipConfirm || mustConfirm) {
         allowed = await openConfirm({
             title: "Close selected tabs?",
-            text: `Close ${count} selected tabs?\nThey will be removed from your browser.`,
+            text: `Close ${count} selected tabs${pinnedText}?\nThey will be removed from your browser.`,
             okText: "Close Tabs",
             dontAskKey: "skipCloseConfirm"
         });
     }
+
 
     if (!allowed) return;
 
@@ -391,6 +416,7 @@ btnCloseSelected.addEventListener("click", async () => {
     await refresh();
     setStatus(`Closed ✅ (${count} tabs)`);
 });
+
 
 
 refresh();
