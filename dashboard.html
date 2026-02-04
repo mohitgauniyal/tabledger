@@ -128,13 +128,27 @@
             word-break: break-all;
             margin-top: 2px;
         }
+
+        .pageTitle {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            margin: 0 0 6px;
+            color: #111827;
+        }
+
+        .pageSubtitle {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 0 0 16px;
+            line-height: 1.35;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Saved Snapshots</h1>
-    <div class="muted">Your saved tab collections (stored locally).</div>
-
+    <h1 class="pageTitle">Saved Snapshots</h1>
+    <p class="pageSubtitle">Saved tab collections (stored locally).</p>
     <div id="snapshots"></div>
 
     <script src="dashboard.js"></script>

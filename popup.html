@@ -6,32 +6,40 @@
   <title>TabLedger</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       padding: 12px;
-      width: 320px;
+      width: 340px;
+      background: #ffffff;
+      color: #111;
     }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .muted {
+      color: #6b7280;
+    }
+
 
     h2 {
       margin: 0 0 6px;
     }
 
-    .muted {
-      color: #666;
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-
     .stats {
       padding: 10px;
       border: 1px solid #eee;
-      border-radius: 10px;
+      border-radius: 14px;
       margin-bottom: 10px;
       font-size: 13px;
+      background: #fafafa;
     }
 
     .value {
-      font-weight: bold;
+      font-weight: 700;
+      color: #111;
     }
+
 
     .actions {
       display: flex;
@@ -40,16 +48,22 @@
     }
 
     button {
-      padding: 8px 10px;
-      border: 1px solid #ddd;
-      background: white;
+      padding: 9px 10px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
       cursor: pointer;
-      border-radius: 10px;
+      border-radius: 12px;
       font-size: 13px;
+      font-weight: 600;
+      transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
     }
 
     button:hover {
-      background: #f5f5f5;
+      background: #f9fafb;
+    }
+
+    button:active {
+      transform: translateY(1px);
     }
 
     .status {
@@ -62,49 +76,53 @@
     .list {
       max-height: 420px;
       overflow-y: auto;
-      border-top: 1px solid #eee;
+      border-top: 1px solid #f0f0f0;
       padding-top: 10px;
     }
 
     .windowTitle {
-      font-weight: bold;
-      font-size: 13px;
+      font-weight: 700;
+      font-size: 12px;
+      color: #374151;
       margin: 10px 0 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .tabRow {
       display: flex;
       gap: 8px;
-      padding: 6px 0;
-      border-bottom: 1px dashed #f0f0f0;
+      padding: 8px 6px;
+      border-radius: 12px;
       align-items: flex-start;
     }
 
+    .tabRow:hover {
+      background: #f9fafb;
+    }
+
     .checkbox {
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     .favicon {
       width: 16px;
       height: 16px;
       margin-top: 2px;
-      border-radius: 3px;
-      background: #f2f2f2;
-    }
-
-    .tabText {
-      flex: 1;
+      border-radius: 4px;
+      background: #f3f4f6;
     }
 
     .tabTitle {
       font-size: 13px;
-      line-height: 1.2;
-      font-weight: 500;
+      line-height: 1.25;
+      font-weight: 600;
+      color: #111827;
     }
 
     .tabUrl {
       font-size: 11px;
-      color: #777;
+      color: #6b7280;
       word-break: break-all;
       margin-top: 2px;
     }
@@ -123,23 +141,28 @@
     }
 
     .logo {
-      width: 22px;
-      height: 22px;
+      width: 32px;
+      height: 32px;
       border-radius: 6px;
     }
 
     .appTitle {
       font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
+      font-weight: 500;
+      letter-spacing: -0.3px;
       margin: 0;
+      color: #111827;
     }
 
     .subtitle {
-      font-size: 12.5px;
-      color: #666;
+      font-size: 15px;
+      color: #6b7280;
       margin-top: 2px;
-      line-height: 1.35;
+      line-height: 1.3;
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .selectionBar {
@@ -152,30 +175,35 @@
 
     .selectedCount {
       font-size: 12px;
-      color: #555;
+      color: #111;
       font-weight: 600;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 6px 10px;
+      border-radius: 999px;
     }
 
-    .selectionButtons {
+
+    .selectionButtons,
+    .primaryActions,
+    .secondaryActions {
       display: flex;
       gap: 8px;
+      align-items: center;
     }
 
     .primaryActions {
-      display: flex;
-      gap: 8px;
       margin-bottom: 8px;
     }
 
     .secondaryActions {
-      display: flex;
-      gap: 8px;
       margin-bottom: 10px;
     }
 
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      transform: none;
     }
 
     .modal.hidden {
@@ -228,15 +256,49 @@
       justify-content: flex-end;
       gap: 8px;
     }
+
+    .btnPrimary {
+      background: #111827;
+      color: white;
+      border-color: #111827;
+    }
+
+    .btnPrimary:hover {
+      background: #0b1220;
+    }
+
+    .btnPrimarySoft {
+      background: #1f2937;
+      color: white;
+      border-color: #1f2937;
+    }
+
+    .btnPrimarySoft:hover {
+      background: #111827;
+    }
+
+    .btnDanger {
+      background: #fff;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+
+    .btnDanger:hover {
+      background: #fff5f5;
+    }
+
+    .btnGhost {
+      background: #fff;
+    }
   </style>
 </head>
 
 <body>
   <div class="header">
-    <img class="logo" src="icons/icon32.png" alt="TabLedger icon" />
+    <img class="logo" src="icons/icon48.png" alt="TabLedger icon" />
     <div>
-      <h2 class="appTitle">TabLedger</h2>
-      <div class="subtitle">Turn open tabs into saved snapshots you can restore later.</div>
+      <h1 class="appTitle">TabLedger</h1>
+      <p class="subtitle">Save tabs. Reopen later.</p>
     </div>
   </div>
 
@@ -254,13 +316,13 @@
   </div>
 
   <div class="primaryActions">
-    <button id="btnSaveSelected" disabled>Save Selected</button>
-    <button id="btnSaveCloseSelected" disabled>Save & Close</button>
+    <button id="btnSaveSelected" class="btnPrimary" disabled>Save Selected</button>
+    <button id="btnSaveCloseSelected" class="btnPrimarySoft" disabled>Save & Close</button>
   </div>
 
   <div class="secondaryActions">
-    <button id="btnCloseSelected" disabled>Close Selected</button>
-    <button id="btnViewSaved">View Saved</button>
+    <button id="btnCloseSelected" class="btnDanger" disabled>Close Selected</button>
+    <button id="btnViewSaved" class="btnGhost">View Saved</button>
   </div>
 
   <div id="status" class="status"></div>
