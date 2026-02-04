@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TabLedger",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Turn open tabs into saved snapshots you can restore later.",
   "permissions": [
     "tabs",
