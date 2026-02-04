@@ -141,6 +141,42 @@
       margin-top: 2px;
       line-height: 1.35;
     }
+
+    .selectionBar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .selectedCount {
+      font-size: 12px;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .selectionButtons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .primaryActions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .secondaryActions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 
@@ -158,11 +194,26 @@
     <div>Tabs: <span id="tabCount" class="value">...</span></div>
   </div>
 
-  <div class="actions">
-    <button id="btnSelectAll">Select All</button>
-    <button id="btnSaveSelected">Save Selected</button>
+  <div class="selectionBar">
+    <div id="selectedCount" class="selectedCount">Selected: 0</div>
+    <div class="selectionButtons">
+      <button id="btnSelectAll">Select All</button>
+      <button id="btnClearSelection" disabled>Clear</button>
+    </div>
+  </div>
+
+  <div class="primaryActions">
+    <button id="btnSaveSelected" disabled>Save Selected</button>
+    <button id="btnSaveCloseSelected" disabled>Save & Close</button>
+  </div>
+
+  <div class="secondaryActions">
+    <button id="btnCloseSelected" disabled>Close Selected</button>
     <button id="btnViewSaved">View Saved</button>
   </div>
+
+  <div id="status" class="status"></div>
+
 
   <div id="status" class="status"></div>
 

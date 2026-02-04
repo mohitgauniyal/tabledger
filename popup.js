@@ -6,6 +6,11 @@ const btnViewSaved = document.getElementById("btnViewSaved");
 const btnSelectAll = document.getElementById("btnSelectAll");
 const btnSaveSelected = document.getElementById("btnSaveSelected");
 
+const btnClearSelection = document.getElementById("btnClearSelection");
+const btnSaveCloseSelected = document.getElementById("btnSaveCloseSelected");
+const btnCloseSelected = document.getElementById("btnCloseSelected");
+const selectedCountEl = document.getElementById("selectedCount");
+
 let latestWindows = [];
 let selectedTabIds = new Set();
 
@@ -36,6 +41,19 @@ function getDomainLabel(url) {
     } catch {
         return "Web";
     }
+}
+
+function updateActionState() {
+    const count = selectedTabIds.size;
+
+    selectedCountEl.textContent = `Selected: ${count}`;
+
+    const hasSelection = count > 0;
+
+    btnClearSelection.disabled = !hasSelection;
+    btnSaveSelected.disabled = !hasSelection;
+    btnSaveCloseSelected.disabled = !hasSelection;
+    btnCloseSelected.disabled = !hasSelection;
 }
 
 function generateSnapshotName(tabs, createdAt) {
@@ -117,6 +135,8 @@ function renderList(windows) {
             cb.addEventListener("change", () => {
                 if (cb.checked) selectedTabIds.add(tab.id);
                 else selectedTabIds.delete(tab.id);
+
+                updateActionState();
             });
 
             // favicon
@@ -150,6 +170,7 @@ function renderList(windows) {
             listEl.appendChild(row);
         });
     });
+    updateActionState();
 }
 
 async function refresh() {
@@ -215,6 +236,22 @@ btnSaveSelected.addEventListener("click", async () => {
     setStatus(`Saved ✅ (${selectedTabs.length} tabs)`);
     selectedTabIds.clear();
     renderList(latestWindows);
+});
+
+btnClearSelection.addEventListener("click", () => {
+    selectedTabIds.clear();
+    renderList(latestWindows);
+    setStatus("Selection cleared ✅");
+});
+
+btnSaveCloseSelected.addEventListener("click", () => {
+    // Placeholder for now
+    setStatus("Save & Close UPNEXT");
+});
+
+btnCloseSelected.addEventListener("click", () => {
+    // Placeholder for now
+    setStatus("Close Selected UPNEXT");
 });
 
 refresh();
