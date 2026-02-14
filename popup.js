@@ -2,6 +2,9 @@ const listEl = document.getElementById("list");
 const errorEl = document.getElementById("error");
 const statusEl = document.getElementById("status");
 
+const latestSnapshotEl = document.getElementById("latestSnapshot");
+const tabStatsEl = document.getElementById("tabStats");
+
 const btnViewSaved = document.getElementById("btnViewSaved");
 const btnSelectAll = document.getElementById("btnSelectAll");
 const btnSaveSelected = document.getElementById("btnSaveSelected");
@@ -20,6 +23,57 @@ const btnConfirmOk = document.getElementById("btnConfirmOk");
 
 let latestWindows = [];
 let selectedTabIds = new Set();
+
+async function renderLatestSnapshot() {
+
+    const data = await chrome.storage.local.get(["snapshots"]);
+    const snapshots = data.snapshots || [];
+
+    if (!snapshots.length) {
+        latestSnapshotEl.classList.add("hidden");
+        return;
+    }
+
+    const latest = snapshots[0];
+
+    latestSnapshotEl.classList.remove("hidden");
+    latestSnapshotEl.innerHTML = "";
+
+    const name = document.createElement("div");
+    name.className = "latestName";
+    name.textContent = latest.name || "Snapshot";
+
+    const meta = document.createElement("div");
+    meta.className = "latestMeta";
+    meta.textContent =
+        `${new Date(latest.createdAt).toLocaleString()} • ${latest.tabs.length} tabs`;
+
+    const actions = document.createElement("div");
+    actions.className = "latestActions";
+
+    const btnOpen = document.createElement("button");
+    btnOpen.textContent = "Reopen";
+    btnOpen.addEventListener("click", async () => {
+        const urls = latest.tabs.map(t => t.url).filter(Boolean);
+        if (urls.length) {
+            await chrome.windows.create({ url: urls });
+        }
+    });
+
+    const btnView = document.createElement("button");
+    btnView.textContent = "View All";
+    btnView.addEventListener("click", () => {
+        chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") });
+    });
+
+    actions.appendChild(btnOpen);
+    actions.appendChild(btnView);
+
+    latestSnapshotEl.appendChild(name);
+    latestSnapshotEl.appendChild(meta);
+    latestSnapshotEl.appendChild(actions);
+}
+
 
 function formatShortDate(ts) {
     const d = new Date(ts);
@@ -192,9 +246,11 @@ function renderList(windows) {
             cb.checked = selectedTabIds.has(tab.id);
 
             cb.addEventListener("change", () => {
-                if (cb.checked) selectedTabIds.add(tab.id);
-                else selectedTabIds.delete(tab.id);
-
+                if (cb.checked) {
+                    selectedTabIds.add(tab.id);
+                } else {
+                    selectedTabIds.delete(tab.id);
+                }
                 updateActionState();
             });
 
@@ -226,9 +282,32 @@ function renderList(windows) {
             row.appendChild(icon);
             row.appendChild(textWrap);
 
+            // ✅ ROW CLICK TO TOGGLE (safe implementation)
+            row.addEventListener("click", (e) => {
+                // If user clicked directly on checkbox, let checkbox handle it
+                if (e.target === cb) return;
+
+                // Ignore interactive elements (future-proof)
+                if (["BUTTON", "A", "INPUT", "TEXTAREA", "SELECT", "LABEL"].includes(e.target.tagName)) {
+                    return;
+                }
+
+                // Toggle checkbox programmatically
+                cb.checked = !cb.checked;
+
+                if (cb.checked) {
+                    selectedTabIds.add(tab.id);
+                } else {
+                    selectedTabIds.delete(tab.id);
+                }
+
+                updateActionState();
+            });
+
             listEl.appendChild(row);
         });
     });
+
     updateActionState();
 }
 
@@ -242,14 +321,18 @@ async function refresh() {
         const winCount = windows.length;
         const tabCount = windows.reduce((acc, w) => acc + (w.tabs?.length || 0), 0);
 
-        document.getElementById("winCount").textContent = winCount;
-        document.getElementById("tabCount").textContent = tabCount;
+        if (tabStatsEl) {
+            tabStatsEl.textContent =
+                `${winCount} window${winCount !== 1 ? "s" : ""} • ${tabCount} tabs`;
+        }
+
 
         renderList(windows);
     } catch (err) {
         console.error(err);
         errorEl.textContent = "Could not load tabs. Please reload extension.";
     }
+    await renderLatestSnapshot();
 }
 
 btnSelectAll.addEventListener("click", () => {

@@ -4,89 +4,261 @@
 <head>
   <meta charset="UTF-8" />
   <title>TabLedger</title>
-  <style>
-    body {
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      padding: 12px;
-      width: 340px;
-      background: #ffffff;
-      color: #111;
-    }
 
+  <style>
     * {
       box-sizing: border-box;
     }
 
-    .muted {
-      color: #6b7280;
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      padding: 14px;
+      width: 340px;
+      background: #ffffff;
+      color: #111827;
+      margin: 0;
     }
 
+    /* ---------- Header ---------- */
 
-    h2 {
-      margin: 0 0 6px;
-    }
-
-    .stats {
-      padding: 10px;
-      border: 1px solid #eee;
-      border-radius: 14px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      background: #fafafa;
-    }
-
-    .value {
-      font-weight: 700;
-      color: #111;
-    }
-
-
-    .actions {
+    .header {
       display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
     }
 
-    button {
-      padding: 9px 10px;
-      border: 1px solid #e5e7eb;
-      background: #fff;
+    .headerLeft {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+
+    .titleWrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .appTitle {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .viewSavedLink {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
       cursor: pointer;
+      border: 1px solid #e5e7eb;
+      padding: 6px 10px;
+      border-radius: 999px;
+      transition: background 0.15s ease;
+    }
+
+    .viewSavedLink:hover {
+      background: #f3f4f6;
+    }
+
+    /* ---------- Latest Snapshot ---------- */
+
+    .latestSection {
+      margin-bottom: 14px;
+    }
+
+    .latestHeader {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .latestCard {
+      border: 1px solid #e5e7eb;
+      border-left: 3px solid #111827;
       border-radius: 12px;
+      padding: 10px;
+      background: #ffffff;
+    }
+
+    .latestCard.hidden {
+      display: none;
+    }
+
+    .latestName {
       font-size: 13px;
       font-weight: 600;
-      transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
+      margin-bottom: 4px;
+    }
+
+    .latestMeta {
+      font-size: 11px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .latestActions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .latestActions button {
+      flex: 1;
+      padding: 6px;
+      font-size: 12px;
+    }
+
+    /* ---------- Selection Bar ---------- */
+
+    .selectionBar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .selectedCount {
+      font-size: 12px;
+      font-weight: 600;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .selectionButtons {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ---------- Buttons ---------- */
+
+    button {
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.05s ease;
     }
 
     button:hover {
-      background: #f9fafb;
+      background: #f3f4f6;
     }
 
     button:active {
       transform: translateY(1px);
     }
 
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btnPrimary {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    .btnPrimary:hover {
+      background: #0f172a;
+    }
+
+    .btnSoft {
+      background: #f3f4f6;
+    }
+
+    .btnDangerText {
+      border: none;
+      background: transparent;
+      color: #b91c1c;
+      padding: 8px 4px;
+    }
+
+    .btnDangerText:hover {
+      background: #fef2f2;
+      border-radius: 8px;
+    }
+
+    .primaryActions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .secondaryActions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .fullWidth {
+      width: 100%;
+    }
+
+    .secondaryActions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .secondaryActions button {
+      flex: 1;
+    }
+
+    .btnDangerOutline {
+      background: #ffffff;
+      border: 1px solid #fca5a5;
+      color: #b91c1c;
+    }
+
+    .btnDangerOutline:hover {
+      background: #fff5f5;
+    }
+
+    /* ---------- Status ---------- */
+
     .status {
       font-size: 12px;
-      color: #0a7a28;
-      margin-bottom: 8px;
+      color: #15803d;
       min-height: 16px;
+      margin-bottom: 8px;
     }
+
+    /* ---------- Tabs List ---------- */
 
     .list {
       max-height: 420px;
       overflow-y: auto;
-      border-top: 1px solid #f0f0f0;
+      border-top: 1px solid #f3f4f6;
       padding-top: 10px;
     }
 
     .windowTitle {
-      font-weight: 700;
-      font-size: 12px;
-      color: #374151;
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
       margin: 10px 0 6px;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
 
     .tabRow {
@@ -115,9 +287,7 @@
 
     .tabTitle {
       font-size: 13px;
-      line-height: 1.25;
       font-weight: 600;
-      color: #111827;
     }
 
     .tabUrl {
@@ -127,84 +297,7 @@
       margin-top: 2px;
     }
 
-    .error {
-      color: #b00020;
-      font-size: 13px;
-      margin-top: 10px;
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-
-    .logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-    }
-
-    .appTitle {
-      font-size: 18px;
-      font-weight: 500;
-      letter-spacing: -0.3px;
-      margin: 0;
-      color: #111827;
-    }
-
-    .subtitle {
-      font-size: 15px;
-      color: #6b7280;
-      margin-top: 2px;
-      line-height: 1.3;
-      max-width: 220px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .selectionBar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .selectedCount {
-      font-size: 12px;
-      color: #111;
-      font-weight: 600;
-      background: #f3f4f6;
-      border: 1px solid #e5e7eb;
-      padding: 6px 10px;
-      border-radius: 999px;
-    }
-
-
-    .selectionButtons,
-    .primaryActions,
-    .secondaryActions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .primaryActions {
-      margin-bottom: 8px;
-    }
-
-    .secondaryActions {
-      margin-bottom: 10px;
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
+    /* ---------- Modal ---------- */
 
     .modal.hidden {
       display: none;
@@ -256,57 +349,30 @@
       justify-content: flex-end;
       gap: 8px;
     }
-
-    .btnPrimary {
-      background: #111827;
-      color: white;
-      border-color: #111827;
-    }
-
-    .btnPrimary:hover {
-      background: #0b1220;
-    }
-
-    .btnPrimarySoft {
-      background: #1f2937;
-      color: white;
-      border-color: #1f2937;
-    }
-
-    .btnPrimarySoft:hover {
-      background: #111827;
-    }
-
-    .btnDanger {
-      background: #fff;
-      border-color: #fca5a5;
-      color: #b91c1c;
-    }
-
-    .btnDanger:hover {
-      background: #fff5f5;
-    }
-
-    .btnGhost {
-      background: #fff;
-    }
   </style>
 </head>
 
 <body>
+
+  <!-- Header -->
   <div class="header">
-    <img class="logo" src="icons/icon48.png" alt="TabLedger icon" />
-    <div>
-      <h1 class="appTitle">TabLedger</h1>
-      <p class="subtitle">Save tabs. Reopen later.</p>
+    <div class="headerLeft">
+      <img class="logo" src="icons/icon48.png" alt="TabLedger icon" />
+      <div class="titleWrap">
+        <h1 class="appTitle">TabLedger</h1>
+        <div class="subtitle" id="tabStats">—</div>
+      </div>
     </div>
+    <div id="btnViewSaved" class="viewSavedLink">Saved</div>
   </div>
 
-  <div class="stats">
-    <div>Windows: <span id="winCount" class="value">...</span></div>
-    <div>Tabs: <span id="tabCount" class="value">...</span></div>
+  <!-- Latest Snapshot -->
+  <div class="latestSection">
+    <div class="latestHeader">Latest Snapshot</div>
+    <div id="latestSnapshot" class="latestCard hidden"></div>
   </div>
 
+  <!-- Selection -->
   <div class="selectionBar">
     <div id="selectedCount" class="selectedCount">Selected: 0</div>
     <div class="selectionButtons">
@@ -315,24 +381,27 @@
     </div>
   </div>
 
+  <!-- Primary Action -->
   <div class="primaryActions">
-    <button id="btnSaveSelected" class="btnPrimary" disabled>Save Selected</button>
-    <button id="btnSaveCloseSelected" class="btnPrimarySoft" disabled>Save & Close</button>
+    <button id="btnSaveCloseSelected" class="btnPrimary fullWidth" disabled>
+      Save & Close
+    </button>
   </div>
 
+  <!-- Secondary Actions -->
   <div class="secondaryActions">
-    <button id="btnCloseSelected" class="btnDanger" disabled>Close Selected</button>
-    <button id="btnViewSaved" class="btnGhost">View Saved</button>
+    <button id="btnSaveSelected" class="btnSoft" disabled>Save</button>
+    <button id="btnCloseSelected" class="btnDangerOutline" disabled>Close</button>
   </div>
 
-  <div id="status" class="status"></div>
-
 
   <div id="status" class="status"></div>
 
+  <!-- Tabs -->
   <div id="list" class="list"></div>
   <div id="error" class="error"></div>
 
+  <!-- Confirm Modal -->
   <div id="confirmModal" class="modal hidden">
     <div class="modalCard">
       <div id="confirmTitle" class="modalTitle">Confirm</div>
@@ -349,6 +418,7 @@
       </div>
     </div>
   </div>
+
   <script src="popup.js"></script>
 </body>
 
