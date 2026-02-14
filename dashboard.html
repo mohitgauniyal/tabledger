@@ -5,28 +5,113 @@
     <meta charset="UTF-8" />
     <title>TabLedger - Saved</title>
     <style>
+        :root {
+            --bg: #f9fafb;
+            --card-bg: #ffffff;
+            --border: #e5e7eb;
+            --muted: #6b7280;
+            --text: #111827;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            padding: 24px;
             max-width: 900px;
             margin: 0 auto;
+            color: var(--text);
         }
 
-        h1 {
-            margin: 0 0 10px;
+        .pageTitle {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin: 0 0 6px;
         }
 
-        .muted {
-            color: #666;
+        .pageSubtitle {
+            font-size: 14px;
+            color: var(--muted);
+            margin: 0 0 20px;
+        }
+
+        /* Search + Filter Row */
+        .searchRow {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            outline: none;
+            background: white;
+            transition: border 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        #domainFilter {
+            height: 38px;
+            padding: 0 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: white;
             font-size: 13px;
-            margin-bottom: 16px;
+            cursor: pointer;
         }
 
+        /* Chips */
+        .frequentChips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .chip {
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #f3f4f6;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+        }
+
+        .chip:hover {
+            background: #e5e7eb;
+        }
+
+        .chip.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Snapshot Card */
         .snapshotCard {
-            border: 1px solid #eee;
-            border-radius: 14px;
-            padding: 14px;
-            margin-bottom: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: box-shadow 0.15s ease, transform 0.15s ease;
+        }
+
+        .snapshotCard:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
         }
 
         .row {
@@ -36,80 +121,88 @@
             align-items: center;
         }
 
-        .meta {
-            font-size: 12px;
-            color: #666;
-            margin-top: 4px;
-        }
-
-        button {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            background: white;
-            cursor: pointer;
-            border-radius: 10px;
-            font-size: 13px;
-        }
-
-        button:hover {
-            background: #f5f5f5;
-        }
-
-        .tabs {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #eee;
-        }
-
-        .tabRow {
-            display: flex;
-            gap: 8px;
-            padding: 6px 0;
-            border-bottom: 1px dashed #f3f3f3;
-        }
-
         .snapshotTitleRow {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .snapshotName {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
         }
 
         .snapshotNameInput {
             font-size: 14px;
-            padding: 6px 8px;
-            border: 1px solid #ddd;
+            padding: 6px 10px;
             border-radius: 10px;
+            border: 1px solid var(--border);
             width: 260px;
+        }
+
+        .meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
         }
 
         .copyHint {
             font-size: 12px;
-            color: #888;
-            margin-left: auto;
+            color: var(--muted);
+            opacity: 0.7;
+        }
+
+        /* Buttons */
+        button {
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        button:hover {
+            background: #f3f4f6;
+        }
+
+        button:first-child {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        button:first-child:hover {
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        /* Tabs Section */
+        .tabs {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
         }
 
         .tabRow {
+            display: flex;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 10px;
             cursor: pointer;
+            transition: background 0.15s ease;
         }
 
         .tabRow:hover {
-            background: #fafafa;
-            border-radius: 10px;
-            padding-left: 6px;
-            padding-right: 6px;
+            background: #f9fafb;
         }
 
         .favicon {
             width: 16px;
             height: 16px;
-            border-radius: 3px;
-            background: #f2f2f2;
+            border-radius: 4px;
+            background: #f3f4f6;
             margin-top: 2px;
         }
 
@@ -124,57 +217,73 @@
 
         .tabUrl {
             font-size: 11px;
-            color: #777;
-            word-break: break-all;
+            color: var(--muted);
             margin-top: 2px;
+            word-break: break-all;
         }
 
-        .pageTitle {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.4px;
-            margin: 0 0 6px;
-            color: #111827;
-        }
-
-        .pageSubtitle {
+        .muted {
+            color: var(--muted);
             font-size: 13px;
-            color: #6b7280;
-            margin: 0 0 16px;
-            line-height: 1.35;
-        }
-
-        .searchBar {
-            margin-bottom: 14px;
-        }
-
-        .searchBar input {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .searchBar input:focus {
-            border-color: #111827;
         }
 
         mark {
             background: #fef08a;
-            padding: 0 2px;
-            border-radius: 3px;
+            padding: 0 3px;
+            border-radius: 4px;
+        }
+
+        .filtersRow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .clearFilters {
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 6px 8px;
+        }
+
+        .clearFilters:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #domainFilter.active,
+        #searchInput.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
         }
     </style>
+
 </head>
 
 <body>
     <h1 class="pageTitle">Saved Snapshots</h1>
     <p class="pageSubtitle">Saved tab collections (stored locally).</p>
-    <div class="searchBar">
+
+    <div class="searchRow">
         <input type="text" id="searchInput" placeholder="Search snapshots..." />
+        <select id="domainFilter">
+            <option value="all">All domains</option>
+        </select>
     </div>
+
+    <div class="filtersRow">
+        <div id="frequentChips" class="frequentChips"></div>
+        <button id="clearFiltersBtn" class="clearFilters hidden">
+            Clear filters
+        </button>
+    </div>
+
     <div id="snapshots"></div>
 
     <script src="dashboard.js"></script>

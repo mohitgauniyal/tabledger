@@ -6,30 +6,15 @@ function init() {
 
     const snapshotsEl = document.getElementById("snapshots");
     const searchInput = document.getElementById("searchInput");
+    const domainFilter = document.getElementById("domainFilter");
+    const frequentChipsEl = document.getElementById("frequentChips");
+    const clearFiltersBtn = document.getElementById("clearFiltersBtn");
 
     let currentQuery = "";
-    let expandState = {}; // manual expand/collapse
-    let matchingIds = new Set(); // search matches
+    let currentDomain = "all";
+    let expandState = {};
 
-    // 🔎 Highlight helper
-    function highlightMatch(text, query) {
-        if (!query || !text) return text;
-
-        const lower = text.toLowerCase();
-        const index = lower.indexOf(query);
-        if (index === -1) return text;
-
-        const before = text.slice(0, index);
-        const match = text.slice(index, index + query.length);
-        const after = text.slice(index + query.length);
-
-        return `${before}<mark>${match}</mark>${after}`;
-    }
-
-    searchInput?.addEventListener("input", (e) => {
-        currentQuery = e.target.value.trim().toLowerCase();
-        render();
-    });
+    /* ---------------- HELPERS ---------------- */
 
     function formatDate(ts) {
         return new Date(ts).toLocaleString();
@@ -37,6 +22,28 @@ function init() {
 
     function getFallbackFavicon() {
         return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' rx='3' ry='3' fill='%23ddd'/%3E%3C/svg%3E";
+    }
+
+    function getDomain(url) {
+        try {
+            const u = new URL(url);
+            return u.hostname.replace(/^www\./, "");
+        } catch {
+            return "";
+        }
+    }
+
+    function highlightMatch(text, query) {
+        if (!query || !text) return text;
+        const lower = text.toLowerCase();
+        const index = lower.indexOf(query);
+        if (index === -1) return text;
+
+        return (
+            text.slice(0, index) +
+            `<mark>${text.slice(index, index + query.length)}</mark>` +
+            text.slice(index + query.length)
+        );
     }
 
     async function loadSnapshots() {
@@ -48,31 +55,30 @@ function init() {
         await chrome.storage.local.set({ snapshots });
     }
 
-    async function openSnapshot(snapshot) {
-        const urls = snapshot.tabs.map((t) => t.url).filter(Boolean);
-        if (urls.length > 0) {
-            await chrome.windows.create({ url: urls });
-        }
-    }
-
-    async function deleteSnapshot(snapshotId) {
+    async function deleteSnapshot(id) {
         const snapshots = await loadSnapshots();
-        const updated = snapshots.filter((s) => s.id !== snapshotId);
+        const updated = snapshots.filter(s => s.id !== id);
         await saveSnapshots(updated);
         render();
     }
 
-    async function renameSnapshot(snapshotId, newName) {
+    async function renameSnapshot(id, newName) {
         const name = (newName || "").trim();
         if (!name) return;
 
         const snapshots = await loadSnapshots();
-        const updated = snapshots.map((s) => {
-            if (s.id !== snapshotId) return s;
-            return { ...s, name };
-        });
+        const updated = snapshots.map(s =>
+            s.id === id ? { ...s, name } : s
+        );
 
         await saveSnapshots(updated);
+    }
+
+    async function openSnapshot(snapshot) {
+        const urls = snapshot.tabs.map(t => t.url).filter(Boolean);
+        if (urls.length) {
+            await chrome.windows.create({ url: urls });
+        }
     }
 
     async function copyToClipboard(text) {
@@ -98,41 +104,144 @@ function init() {
         }, 900);
     }
 
+    /* ---------------- EVENTS ---------------- */
+
+    searchInput.addEventListener("input", (e) => {
+        currentQuery = e.target.value.trim().toLowerCase();
+        render();
+    });
+
+    domainFilter.addEventListener("change", (e) => {
+        currentDomain = e.target.value;
+        render();
+    });
+
+    clearFiltersBtn?.addEventListener("click", () => {
+        currentQuery = "";
+        currentDomain = "all";
+        searchInput.value = "";
+        domainFilter.value = "all";
+        render();
+    });
+
+    /* ---------------- RENDER ---------------- */
+
     async function render() {
-        let snapshots = await loadSnapshots();
-        matchingIds.clear();
 
-        // 🔎 SEARCH FILTER + MATCH TRACKING
-        if (currentQuery) {
-            snapshots = snapshots.filter((s) => {
-                const nameMatch =
-                    (s.name || "").toLowerCase().includes(currentQuery);
+        const allSnapshots = await loadSnapshots();
 
-                const tabMatch = s.tabs.some((t) => {
-                    return (
-                        (t.title || "").toLowerCase().includes(currentQuery) ||
-                        (t.url || "").toLowerCase().includes(currentQuery)
-                    );
+        /* -------- DOMAIN DROPDOWN BUILD -------- */
+
+        const domainCounts = {};
+
+        allSnapshots.forEach(s => {
+            s.tabs.forEach(t => {
+                const d = getDomain(t.url);
+                if (!d) return;
+                domainCounts[d] = (domainCounts[d] || 0) + 1;
+            });
+        });
+
+        domainFilter.innerHTML = `<option value="all">All domains</option>`;
+
+        Object.keys(domainCounts).sort().forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d;
+            opt.textContent = d;
+            domainFilter.appendChild(opt);
+        });
+
+        domainFilter.value = currentDomain;
+
+        /* -------- FREQUENT CHIPS -------- */
+
+        frequentChipsEl.innerHTML = "";
+
+        Object.entries(domainCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .forEach(([domain]) => {
+
+                const chip = document.createElement("div");
+                chip.className = "chip";
+                chip.textContent = domain;
+
+                if (currentDomain === domain) {
+                    chip.classList.add("active");
+                }
+
+                chip.addEventListener("click", () => {
+                    if (currentDomain === domain) {
+                        currentDomain = "all";
+                    } else {
+                        currentDomain = domain;
+                    }
+                    render();
                 });
 
-                const matched = nameMatch || tabMatch;
-
-                if (matched) matchingIds.add(s.id);
-
-                return matched;
+                frequentChipsEl.appendChild(chip);
             });
+
+        /* -------- FILTER VISUAL STATE -------- */
+
+        if (currentQuery) {
+            searchInput.classList.add("active");
+        } else {
+            searchInput.classList.remove("active");
         }
+
+        if (currentDomain !== "all") {
+            domainFilter.classList.add("active");
+        } else {
+            domainFilter.classList.remove("active");
+        }
+
+        if (currentQuery || currentDomain !== "all") {
+            clearFiltersBtn?.classList.remove("hidden");
+        } else {
+            clearFiltersBtn?.classList.add("hidden");
+        }
+
+        /* -------- TAB LEVEL FILTERING -------- */
+
+        const snapshots = allSnapshots
+            .map(snapshot => {
+
+                const filteredTabs = snapshot.tabs.filter(tab => {
+
+                    const title = (tab.title || "").toLowerCase();
+                    const url = (tab.url || "").toLowerCase();
+                    const domain = getDomain(tab.url);
+
+                    const queryMatch =
+                        !currentQuery ||
+                        title.includes(currentQuery) ||
+                        url.includes(currentQuery);
+
+                    const domainMatch =
+                        currentDomain === "all" ||
+                        domain === currentDomain;
+
+                    return queryMatch && domainMatch;
+                });
+
+                return { ...snapshot, tabs: filteredTabs };
+
+            })
+            .filter(s => s.tabs.length > 0);
 
         snapshotsEl.innerHTML = "";
 
         if (snapshots.length === 0) {
-            snapshotsEl.innerHTML = currentQuery
-                ? `<p class="muted">No snapshots match your search.</p>`
-                : `<p class="muted">No saved snapshots yet.</p>`;
+            snapshotsEl.innerHTML =
+                `<p class="muted">No matching tabs found.</p>`;
             return;
         }
 
+        /* -------- RENDER CARDS -------- */
+
         snapshots.forEach((s, idx) => {
+
             const card = document.createElement("div");
             card.className = "snapshotCard";
 
@@ -146,15 +255,14 @@ function init() {
 
             const nameEl = document.createElement("div");
             nameEl.className = "snapshotName";
-            nameEl.title = "Click to rename";
 
             const displayName = s.name || `Snapshot ${idx + 1}`;
 
-            if (currentQuery) {
-                nameEl.innerHTML = highlightMatch(displayName, currentQuery);
-            } else {
-                nameEl.textContent = displayName;
-            }
+            nameEl.innerHTML = currentQuery
+                ? highlightMatch(displayName, currentQuery)
+                : displayName;
+
+            nameEl.title = "Click to rename";
 
             const hint = document.createElement("div");
             hint.className = "copyHint";
@@ -165,23 +273,25 @@ function init() {
 
             const meta = document.createElement("div");
             meta.className = "meta";
-            meta.textContent = `${formatDate(s.createdAt)} • ${s.tabs.length} tabs`;
+            meta.textContent =
+                `${formatDate(s.createdAt)} • ${s.tabs.length} tabs`;
 
             left.appendChild(titleRow);
             left.appendChild(meta);
 
-            // Rename inline
+            /* ----- Rename Snapshot ----- */
+
             nameEl.addEventListener("click", () => {
                 const input = document.createElement("input");
                 input.className = "snapshotNameInput";
                 input.value = displayName;
+
                 nameEl.replaceWith(input);
                 input.focus();
                 input.select();
 
                 const saveAndExit = async () => {
-                    const newName = input.value.trim();
-                    await renameSnapshot(s.id, newName);
+                    await renameSnapshot(s.id, input.value);
                     render();
                 };
 
@@ -203,7 +313,14 @@ function init() {
 
             const btnDelete = document.createElement("button");
             btnDelete.textContent = "Delete";
-            btnDelete.addEventListener("click", () => deleteSnapshot(s.id));
+
+            btnDelete.addEventListener("click", async () => {
+                const confirmed = confirm(
+                    `Delete "${displayName}"?\n\nThis action cannot be undone.`
+                );
+                if (!confirmed) return;
+                await deleteSnapshot(s.id);
+            });
 
             right.appendChild(btnOpen);
             right.appendChild(btnDelete);
@@ -211,45 +328,45 @@ function init() {
             header.appendChild(left);
             header.appendChild(right);
 
-            // 📂 TABS
+            /* ----- Tabs ----- */
+
             const tabsDiv = document.createElement("div");
             tabsDiv.className = "tabs";
 
-            const isExpanded = currentQuery
-                ? matchingIds.has(s.id) // auto-expand on search
-                : expandState[s.id] === true;
+            const autoExpanded =
+                currentQuery || currentDomain !== "all";
 
-            const visibleTabs = isExpanded ? s.tabs : s.tabs.slice(0, 10);
+            const isExpanded =
+                autoExpanded || expandState[s.id] === true;
 
-            visibleTabs.forEach((t) => {
+            const visibleTabs =
+                isExpanded ? s.tabs : s.tabs.slice(0, 10);
+
+            visibleTabs.forEach(tab => {
+
                 const row = document.createElement("div");
                 row.className = "tabRow";
                 row.title = "Click to copy link";
 
                 const icon = document.createElement("img");
                 icon.className = "favicon";
-                icon.src = t.favIconUrl || getFallbackFavicon();
-                icon.onerror = () => (icon.src = getFallbackFavicon());
+                icon.src = tab.favIconUrl || getFallbackFavicon();
+                icon.onerror = () => icon.src = getFallbackFavicon();
 
                 const text = document.createElement("div");
                 text.className = "tabText";
 
                 const title = document.createElement("div");
                 title.className = "tabTitle";
+                title.innerHTML = currentQuery
+                    ? highlightMatch(tab.title || tab.url || "", currentQuery)
+                    : (tab.title || tab.url || "(No title)");
 
                 const url = document.createElement("div");
                 url.className = "tabUrl";
-
-                const tabTitle = t.title || t.url || "(No title)";
-                const tabUrl = t.url || "";
-
-                if (currentQuery) {
-                    title.innerHTML = highlightMatch(tabTitle, currentQuery);
-                    url.innerHTML = highlightMatch(tabUrl, currentQuery);
-                } else {
-                    title.textContent = tabTitle;
-                    url.textContent = tabUrl;
-                }
+                url.innerHTML = currentQuery
+                    ? highlightMatch(tab.url || "", currentQuery)
+                    : (tab.url || "");
 
                 text.appendChild(title);
                 text.appendChild(url);
@@ -258,16 +375,15 @@ function init() {
                 row.appendChild(text);
 
                 row.addEventListener("click", async () => {
-                    if (!t.url) return;
-                    await copyToClipboard(t.url);
+                    if (!tab.url) return;
+                    await copyToClipboard(tab.url);
                     showToast(hint, "Copied ✅");
                 });
 
                 tabsDiv.appendChild(row);
             });
 
-            // Expand / collapse controls
-            if (!currentQuery && !isExpanded && s.tabs.length > 10) {
+            if (!autoExpanded && !isExpanded && s.tabs.length > 10) {
                 const more = document.createElement("div");
                 more.className = "meta";
                 more.style.cursor = "pointer";
@@ -279,20 +395,6 @@ function init() {
                 });
 
                 tabsDiv.appendChild(more);
-            }
-
-            if (!currentQuery && isExpanded && s.tabs.length > 10) {
-                const collapse = document.createElement("div");
-                collapse.className = "meta";
-                collapse.style.cursor = "pointer";
-                collapse.textContent = "Show less";
-
-                collapse.addEventListener("click", () => {
-                    expandState[s.id] = false;
-                    render();
-                });
-
-                tabsDiv.appendChild(collapse);
             }
 
             card.appendChild(header);
