@@ -143,12 +143,38 @@
             margin: 0 0 16px;
             line-height: 1.35;
         }
+
+        .searchBar {
+            margin-bottom: 14px;
+        }
+
+        .searchBar input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .searchBar input:focus {
+            border-color: #111827;
+        }
+
+        mark {
+            background: #fef08a;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
     </style>
 </head>
 
 <body>
     <h1 class="pageTitle">Saved Snapshots</h1>
     <p class="pageSubtitle">Saved tab collections (stored locally).</p>
+    <div class="searchBar">
+        <input type="text" id="searchInput" placeholder="Search snapshots..." />
+    </div>
     <div id="snapshots"></div>
 
     <script src="dashboard.js"></script>
