@@ -1,46 +1,85 @@
 # TabLedger
 
-TabLedger is a lightweight Chrome extension to help you save tab snapshots and reopen them later. It’s built for people who keep too many tabs open and want an easy way to clean up without losing context.
+TabLedger is a lightweight Chrome extension for saving tab snapshots and reopening them later.
 
-## Features (v0.0.1)
+It is built for people who regularly work with large numbers of tabs and need a structured way to clean up their workspace without losing context.
 
-- View all open tabs grouped by windows
-- Select tabs and save them as a snapshot
-- View saved snapshots in a dashboard
-- Reopen saved snapshots anytime
-- Delete snapshots when you're done
+TabLedger focuses on clarity, workflow control, and fast retrieval — while keeping everything local and privacy-first.
 
-## Updates (v0.0.2)
+---
 
-### New Features
-- Save & Close selected tabs (save a snapshot and instantly clean up)
-- Close selected tabs (with confirmation)
-- Rename snapshots in the dashboard
-- Click-to-copy saved links from snapshots
+## Install
 
-### Improvements
-- Auto snapshot names based on top domains + date (e.g. *Medium + Gmail • Feb 4*)
-- Pinned tab safety
-  - Select All skips pinned tabs
-  - Close actions always confirm if pinned tabs are selected
-- UI polish for a cleaner, modern look
+Chrome Web Store:  
+https://chromewebstore.google.com/detail/tabledger/iokcjokpeefodkkbemjdjpdelbbekegg
 
-## How to run locally (Developer Mode)
+---
 
-1. Clone the repo
-2. Open Chrome and go to `chrome://extensions`
+## What TabLedger Does
+
+TabLedger allows you to:
+
+- Save selected tabs as structured snapshots
+- Reopen saved sessions at any time
+- Clean up your workspace without losing active research
+- Search and filter through saved tabs efficiently
+- Manage snapshots with safe and intentional controls
+
+The extension is designed to feel lightweight, predictable, and fast — both in the popup and the dashboard.
+
+---
+
+## Design Principles
+
+- **Local-first** – All data is stored locally using `chrome.storage.local`
+- **Workflow-oriented** – Built around real tab cleanup patterns
+- **Minimal friction** – Clear primary actions and safe destructive behavior
+- **Progressive refinement** – Continuous UX and interaction improvements
+
+---
+
+## Version History
+
+TabLedger is under active development.
+
+Detailed release notes for each version can be found here:
+
+Releases:  
+https://github.com/<your-username>/<your-repo>/releases
+
+### Milestones
+
+- **v0.0.1** – Initial public release (core snapshot system)
+- **v0.0.2** – Workflow & control improvements
+- **v0.0.3** – Search, filtering, and UX refinement
+
+---
+
+## Running Locally (Developer Mode)
+
+1. Clone the repository
+2. Open Chrome and navigate to `chrome://extensions`
 3. Enable **Developer mode**
 4. Click **Load unpacked**
 5. Select the project folder
+
+---
 
 ## Permissions
 
 TabLedger uses:
 
-- `tabs`: to read your open tabs so you can save snapshots
-- `storage`: to store snapshots locally on your device
+- `tabs` — to read open tabs so snapshots can be created
+- `storage` — to store snapshots locally on your device
+
+No external servers are used.
+
+---
 
 ## Privacy
 
-All snapshots are stored locally using `chrome.storage.local`.  
-No accounts. No cloud sync. No tracking.
+All snapshots are stored locally on your device.
+
+No accounts.  
+No cloud sync.  
+No tracking.
