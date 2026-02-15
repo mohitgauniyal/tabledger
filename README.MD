@@ -10,8 +10,7 @@ TabLedger focuses on clarity, workflow control, and fast retrieval — while kee
 
 ## Install
 
-Chrome Web Store:  
-https://chromewebstore.google.com/detail/tabledger/iokcjokpeefodkkbemjdjpdelbbekegg
+Chrome Web Store: [Install TabLedger](https://chromewebstore.google.com/detail/iokcjokpeefodkkbemdijpdelbbekegg)
 
 ---
 
@@ -44,8 +43,7 @@ TabLedger is under active development.
 
 Detailed release notes for each version can be found here:
 
-Releases:  
-https://github.com/<your-username>/<your-repo>/releases
+Releases: [View all releases](https://github.com/mohitgauniyal/tabledger/releases)
 
 ### Milestones
 
