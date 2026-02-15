@@ -6,13 +6,13 @@ It is built for people who regularly work with large numbers of tabs and need a 
 
 TabLedger focuses on clarity, workflow control, and fast retrieval — while keeping everything local and privacy-first.
 
----
+
 
 ## Install
 
 Chrome Web Store: [Install TabLedger](https://chromewebstore.google.com/detail/iokcjokpeefodkkbemdijpdelbbekegg)
 
----
+
 
 ## What TabLedger Does
 
@@ -26,7 +26,7 @@ TabLedger allows you to:
 
 The extension is designed to feel lightweight, predictable, and fast — both in the popup and the dashboard.
 
----
+
 
 ## Design Principles
 
@@ -35,7 +35,7 @@ The extension is designed to feel lightweight, predictable, and fast — both in
 - **Minimal friction** – Clear primary actions and safe destructive behavior
 - **Progressive refinement** – Continuous UX and interaction improvements
 
----
+
 
 ## Version History
 
@@ -51,7 +51,7 @@ Releases: [View all releases](https://github.com/mohitgauniyal/tabledger/release
 - **v0.0.2** – Workflow & control improvements
 - **v0.0.3** – Search, filtering, and UX refinement
 
----
+
 
 ## Running Locally (Developer Mode)
 
@@ -61,7 +61,7 @@ Releases: [View all releases](https://github.com/mohitgauniyal/tabledger/release
 4. Click **Load unpacked**
 5. Select the project folder
 
----
+
 
 ## Permissions
 
@@ -72,7 +72,7 @@ TabLedger uses:
 
 No external servers are used.
 
----
+
 
 ## Privacy
 
