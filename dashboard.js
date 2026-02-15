@@ -263,13 +263,7 @@ function init() {
                 : displayName;
 
             nameEl.title = "Click to rename";
-
-            const hint = document.createElement("div");
-            hint.className = "copyHint";
-            hint.textContent = "Click link to copy";
-
             titleRow.appendChild(nameEl);
-            titleRow.appendChild(hint);
 
             const meta = document.createElement("div");
             meta.className = "meta";
