@@ -1,18 +1,28 @@
 # TabLedger
 
+<p align="center">
+  <img src="./icons/logo128.png" width="96" />
+</p>
+
+###Organize your browser in seconds. Save sessions, search inside links, and restore instantly.
+
+<p align="center">
+  <img src="./assets/1.png" />
+</p>
+
 TabLedger is a lightweight Chrome extension for saving tab snapshots and reopening them later.
 
 It is built for people who regularly work with large numbers of tabs and need a structured way to clean up their workspace without losing context.
 
 TabLedger focuses on clarity, workflow control, and fast retrieval — while keeping everything local and privacy-first.
 
-
+---
 
 ## Install
 
 Chrome Web Store: [Install TabLedger](https://chromewebstore.google.com/detail/iokcjokpeefodkkbemdijpdelbbekegg)
 
-
+---
 
 ## What TabLedger Does
 
@@ -26,7 +36,20 @@ TabLedger allows you to:
 
 The extension is designed to feel lightweight, predictable, and fast — both in the popup and the dashboard.
 
+---
 
+## Screenshots
+
+<p align="center">
+  <img src="./assets/2.png" width="48%" />
+  <img src="./assets/3.png" width="48%" />
+</p>
+
+<p align="center">
+  <img src="./assets/4.png" width="48%" />
+</p>
+
+---
 
 ## Design Principles
 
@@ -35,7 +58,7 @@ The extension is designed to feel lightweight, predictable, and fast — both in
 - **Minimal friction** – Clear primary actions and safe destructive behavior
 - **Progressive refinement** – Continuous UX and interaction improvements
 
-
+---
 
 ## Version History
 
@@ -51,7 +74,7 @@ Releases: [View all releases](https://github.com/mohitgauniyal/tabledger/release
 - **v0.0.2** – Workflow & control improvements
 - **v0.0.3** – Search, filtering, and UX refinement
 
-
+---
 
 ## Running Locally (Developer Mode)
 
@@ -61,7 +84,7 @@ Releases: [View all releases](https://github.com/mohitgauniyal/tabledger/release
 4. Click **Load unpacked**
 5. Select the project folder
 
-
+---
 
 ## Permissions
 
@@ -72,12 +95,12 @@ TabLedger uses:
 
 No external servers are used.
 
-
+---
 
 ## Privacy
 
 All snapshots are stored locally on your device.
 
-No accounts.  
-No cloud sync.  
-No tracking.
+- ✅ No accounts
+- ✅ No cloud sync
+- ✅ No tracking
