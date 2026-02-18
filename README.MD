@@ -1,10 +1,10 @@
 # TabLedger
 
 <p align="center">
-  <img src="./icons/logo128.png" width="96" />
+  <img src="./icons/icon128.png" width="96" />
 </p>
 
-###Organize your browser in seconds. Save sessions, search inside links, and restore instantly.
+### Organize your browser in seconds. Save sessions, search inside links, and restore instantly.
 
 <p align="center">
   <img src="./assets/1.png" />
@@ -16,13 +16,11 @@ It is built for people who regularly work with large numbers of tabs and need a 
 
 TabLedger focuses on clarity, workflow control, and fast retrieval — while keeping everything local and privacy-first.
 
----
 
 ## Install
 
 Chrome Web Store: [Install TabLedger](https://chromewebstore.google.com/detail/iokcjokpeefodkkbemdijpdelbbekegg)
 
----
 
 ## What TabLedger Does
 
@@ -38,7 +36,7 @@ The extension is designed to feel lightweight, predictable, and fast — both in
 
 ---
 
-## Screenshots
+## Overview
 
 <p align="center">
   <img src="./assets/2.png" width="48%" />
